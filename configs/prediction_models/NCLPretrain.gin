@@ -1,0 +1,45 @@
+# === IMPORTS ===
+import icu_benchmarks.ssl.augmentations
+import icu_benchmarks.ssl.loss
+import icu_benchmarks.ssl.memory
+import icu_benchmarks.ssl.ssl_datasets
+import icu_benchmarks.models.dl_models.tcn
+import icu_benchmarks.models.dl_models.projectors
+import icu_benchmarks.models.wrappers
+
+# === DATASET ===
+train_common.dataset = @PredictionDatasetNCL()
+
+PredictionDatasetNCL.dyn_path = "demo_data/base/mimic_iv_demo/dyn.parquet"
+PredictionDatasetNCL.window_length = 48
+PredictionDatasetNCL.stride = 1
+augment_fn = @icu_benchmarks.ssl.augmentations.augment_fn
+PredictionDatasetNCL.augment_fn = @augment_fn
+
+# === MODEL ===
+train_common.model = @NCLWrapper()
+
+NCLWrapper.encoder = @TemporalConvNet()
+NCLWrapper.projector = @NonLinearProjector()
+NCLWrapper.loss_fn = @NCLLoss()
+NCLWrapper.projection_dim = 64
+NCLWrapper.queue_size = 65536
+
+# === LOSS ===
+NCLLoss.temperature = 0.1
+NCLLoss.alpha = 0.5
+NCLLoss.threshold = 8
+
+# === ENCODER ===
+TemporalConvNet.input_size = (48, 48)
+TemporalConvNet.num_channels = 64
+TemporalConvNet.num_classes = 64
+TemporalConvNet.kernel_size = 2
+TemporalConvNet.dropout = 0.1
+TemporalConvNet.max_seq_length = 48
+
+# === PROJECTOR ===
+NonLinearProjector.input_dim = 64
+NonLinearProjector.hidden_dim = 128
+NonLinearProjector.output_dim = 64
+NonLinearProjector.num_layers = 2

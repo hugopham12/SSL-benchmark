@@ -19,8 +19,10 @@ parameters:
     values:
       - demo_data/los/eicu_demo
       - demo_data/los/mimic_demo
+      - demo_data/los/mimic_iv_demo
       - demo_data/kidney_function/eicu_demo
       - demo_data/kidney_function/mimic_demo
+      - demo_data/kidney_function/mimic_iv_demo
   model:
     values:
       - ElasticNet
